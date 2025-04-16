@@ -107,8 +107,7 @@ const clickhouseController = {
   // Preview data from a table with selected columns
   previewData: async (req, res, next) => {
     try {
-      // console.log(req.body);
-      console.log(req.body);
+      
       const { host, port, database, username, token, table, columns } = req.body;
       
       if (!table || !columns || !columns.length) {

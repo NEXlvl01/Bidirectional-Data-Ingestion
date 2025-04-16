@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { useIngestion } from '../../contexts/IngestionContext';
 import { api } from '../../lib/api';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Button } from '../ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Database, Server, Key, User, ChevronRight } from 'lucide-react';
 
 const ClickHouseForm = () => {
   const {
@@ -22,7 +24,6 @@ const ClickHouseForm = () => {
     availableTables,
     setPreviewData
   } = useIngestion();
-  
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -106,58 +107,101 @@ const ClickHouseForm = () => {
       setError(error.message);
     }
   };
+
+  const formItemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 }
+  };
   
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+    <motion.div 
+      className="space-y-6"
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.1
+          }
+        }
+      }}
+    >
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 gap-6" 
+        variants={formItemVariants}
+      >
         <div className="space-y-2">
-          <Label htmlFor="host">Host</Label>
+          <Label htmlFor="host" className="flex items-center gap-2">
+            <Server className="h-4 w-4 text-blue-600" />
+            Host
+          </Label>
           <Input
             id="host"
             name="host"
             value={clickHouseParams.host}
             onChange={handleInputChange}
             placeholder="localhost"
+            className="border-blue-200 focus:border-blue-400"
           />
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="port">Port</Label>
+          <Label htmlFor="port" className="flex items-center gap-2">
+            <ChevronRight className="h-4 w-4 text-blue-600" />
+            Port
+          </Label>
           <Input
             id="port"
             name="port"
             value={clickHouseParams.port}
             onChange={handleInputChange}
             placeholder="8123"
+            className="border-blue-200 focus:border-blue-400"
           />
         </div>
-      </div>
+      </motion.div>
       
-      <div className="space-y-2">
-        <Label htmlFor="database">Database</Label>
+      <motion.div className="space-y-2" variants={formItemVariants}>
+        <Label htmlFor="database" className="flex items-center gap-2">
+          <Database className="h-4 w-4 text-blue-600" />
+          Database
+        </Label>
         <Input
           id="database"
           name="database"
           value={clickHouseParams.database}
           onChange={handleInputChange}
           placeholder="default"
+          className="border-blue-200 focus:border-blue-400"
         />
-      </div>
+      </motion.div>
       
-      <div className="grid grid-cols-2 gap-4">
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        variants={formItemVariants}
+      >
         <div className="space-y-2">
-          <Label htmlFor="username">Username</Label>
+          <Label htmlFor="username" className="flex items-center gap-2">
+            <User className="h-4 w-4 text-blue-600" />
+            Username
+          </Label>
           <Input
             id="username"
             name="username"
             value={clickHouseParams.username}
             onChange={handleInputChange}
             placeholder="default"
+            className="border-blue-200 focus:border-blue-400"
           />
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="token">JWT Token</Label>
+          <Label htmlFor="token" className="flex items-center gap-2">
+            <Key className="h-4 w-4 text-blue-600" />
+            JWT Token
+          </Label>
           <Input
             id="token"
             name="token"
@@ -165,20 +209,32 @@ const ClickHouseForm = () => {
             value={clickHouseParams.token}
             onChange={handleInputChange}
             placeholder="JWT Token"
+            className="border-blue-200 focus:border-blue-400"
           />
         </div>
-      </div>
+      </motion.div>
       
-      <Button onClick={handleConnect} className="w-full">
-        Connect to ClickHouse
-      </Button>
+      <motion.div variants={formItemVariants}>
+        <Button 
+          onClick={handleConnect} 
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300"
+        >
+          <Database className="h-4 w-4 mr-2" />
+          Connect to ClickHouse
+        </Button>
+      </motion.div>
       
       {availableTables.length > 0 && (
-        <div className="space-y-4 mt-4">
+        <motion.div 
+          className="space-y-4 pt-4 border-t border-blue-100"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          transition={{ duration: 0.3 }}
+        >
           <div className="space-y-2">
             <Label htmlFor="table-select">Select Table</Label>
             <Select value={selectedTable} onValueChange={handleTableChange}>
-              <SelectTrigger>
+              <SelectTrigger className="border-blue-200 focus:border-blue-400">
                 <SelectValue placeholder="Select a table" />
               </SelectTrigger>
               <SelectContent>
@@ -192,13 +248,16 @@ const ClickHouseForm = () => {
           </div>
           
           {selectedColumns.length > 0 && (
-            <Button onClick={handlePreview} className="w-full">
+            <Button 
+              onClick={handlePreview} 
+              className="w-full bg-indigo-600 hover:bg-indigo-700"
+            >
               Preview Data
             </Button>
           )}
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
 
