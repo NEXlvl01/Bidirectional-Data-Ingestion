@@ -1,0 +1,13 @@
+# prompts.txt
+
+1. "How can I implement bidirectional data ingestion between ClickHouse and CSV files using Node.js and React?"
+2. "Generate a React form for configuring ClickHouse connection with host, port, database, JWT token, etc."
+3. "How do I securely pass JWT token when querying ClickHouse using HTTP interface?"
+4. "What is the most efficient way to batch insert JSON data into ClickHouse?"
+5. "Give me a reusable utility function to read specific columns from a CSV file using Node.js."
+6. "How to handle file uploads in a React frontend and send it to a Node.js backend using Axios?"
+7. "Suggest best practices for streaming large datasets from a database to a file."
+8. "How to preview the first 100 records from a CSV file on the frontend before ingestion?"
+9. "How to build a UI in React to show real-time ingestion status with error handling?"
+10. "Create a JOIN query generator utility in Node.js given multiple ClickHouse tables and join conditions."
+11. "Write a Docker command to quickly spin up a ClickHouse instance locally for development/testing."
