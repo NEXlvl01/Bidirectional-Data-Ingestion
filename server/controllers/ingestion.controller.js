@@ -1,23 +1,40 @@
-const path = require('path');
-const clickhouseModel = require('../models/clickhouse.model');
-const flatFileModel = require('../models/flatfile.model');
-const { createClient } = require('@clickhouse/client');
-const { createObjectCsvWriter } = require('csv-writer');
+const path = require("path");
+const clickhouseModel = require("../models/clickhouse.model");
+const fs = require("fs");
+const flatFileModel = require("../models/flatfile.model");
+const { createClient } = require("@clickhouse/client");
+const { createObjectCsvWriter } = require("csv-writer");
 
 // Controller for ingestion operations
 const ingestionController = {
   // Transfer data from ClickHouse to Flat File
   clickhouseToFlatFile: async (req, res, next) => {
     try {
-      const { 
-        host, port, database, username, token, 
-        table, columns, outputFilename, delimiter 
+      console.log(req.body);
+      const {
+        host,
+        port,
+        database,
+        username,
+        token,
+        table,
+        columns,
+        outputFilename,
+        delimiter,
       } = req.body;
-      
-      if (!host || !port || !database || !table || !columns || !columns.length || !outputFilename) {
+
+      if (
+        !host ||
+        !port ||
+        !database ||
+        !table ||
+        !columns ||
+        !columns.length ||
+        !outputFilename
+      ) {
         return res.status(400).json({
           success: false,
-          message: 'Missing required parameters'
+          message: "Missing required parameters",
         });
       }
 
@@ -26,81 +43,114 @@ const ingestionController = {
         host: `${host}:${port}`,
         database,
         username,
-        password: token
+        password: token,
       });
 
       // Output file path
-      const outputPath = path.join(__dirname, '../../uploads', outputFilename);
-      
+      const outputPath = path.join(__dirname, "../../uploads", outputFilename);
+
+      const uploadsDir = path.join(__dirname, "../../uploads");
+
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+
       // Execute ingestion
       const result = await clickhouseModel.exportToFlatFile(
-        client, table, columns, outputPath, delimiter || ','
+        client,
+        table,
+        columns,
+        outputPath,
+        delimiter || ","
       );
-      
+
       res.status(200).json({
         success: true,
-        message: 'Data successfully exported to flat file',
+        message: "Data successfully exported to flat file",
         data: {
           recordsProcessed: result.count,
           outputFile: outputFilename,
-          outputPath: outputPath
-        }
+          outputPath: outputPath,
+        },
       });
     } catch (error) {
-      console.error('Error during ClickHouse to flat file ingestion:', error);
+      console.error("Error during ClickHouse to flat file ingestion:", error);
       res.status(500).json({
         success: false,
-        message: `Ingestion failed: ${error.message}`
+        message: `Ingestion failed: ${error.message}`,
       });
     }
   },
 
   // Transfer data from Flat File to ClickHouse
   flatFileToClickHouse: async (req, res, next) => {
+    console.log(req.body);
     try {
-      const { 
-        host, port, database, username, token,
-        filename, delimiter, columns, targetTable, createTable
+      const {
+        host,
+        port,
+        database,
+        username,
+        token,
+        filename,
+        delimiter,
+        columns,
+        targetTable,
+        createTable,
       } = req.body;
-      
-      if (!host || !port || !database || !filename || !columns || !columns.length || !targetTable) {
+
+      if (
+        !host ||
+        !port ||
+        !database ||
+        !filename ||
+        !columns ||
+        !columns.length ||
+        !targetTable
+      ) {
         return res.status(400).json({
           success: false,
-          message: 'Missing required parameters'
+          message: "Missing required parameters",
         });
       }
 
-      const filePath = path.join(__dirname, '../../uploads', filename);
+      const filePath = path.join(__dirname, "../../uploads", filename);
 
       // Create ClickHouse client
       const client = createClient({
         host: `${host}:${port}`,
         database,
         username,
-        password: token
+        password: token,
+        request_timeout: 120000, // 120 seconds timeout
       });
 
       // Execute ingestion
       const result = await flatFileModel.importToClickHouse(
-        client, filePath, delimiter || ',', columns, targetTable, createTable
+        client,
+        filePath,
+        delimiter || ",",
+        columns,
+        targetTable,
+        createTable
       );
-      
+
       res.status(200).json({
         success: true,
-        message: 'Data successfully imported to ClickHouse',
+        message: "Data successfully imported to ClickHouse",
         data: {
           recordsProcessed: result.count,
-          targetTable: targetTable
-        }
+          targetTable: targetTable,
+        },
       });
     } catch (error) {
-      console.error('Error during flat file to ClickHouse ingestion:', error);
+      console.error("Error during flat file to ClickHouse ingestion:", error);
       res.status(500).json({
         success: false,
-        message: `Ingestion failed: ${error.message}`
+        message: `Ingestion failed: ${error.message}`,
       });
     }
-  }
+  },
 };
 
 module.exports = ingestionController;

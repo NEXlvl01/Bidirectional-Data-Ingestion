@@ -33,6 +33,7 @@ export const IngestionProvider = ({ children }) => {
   const [availableTables, setAvailableTables] = useState([]);
   const [availableColumns, setAvailableColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
+  const [selectedTable, setSelectedTable] = useState('');
   
   // Data preview
   const [previewData, setPreviewData] = useState([]);
@@ -85,6 +86,8 @@ export const IngestionProvider = ({ children }) => {
   const value = {
     source,
     setSource,
+    selectedTable,
+    setSelectedTable,
     clickHouseParams,
     setClickHouseParams,
     flatFileParams,

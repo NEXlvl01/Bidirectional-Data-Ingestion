@@ -10,6 +10,8 @@ const ClickHouseForm = () => {
   const {
     clickHouseParams,
     selectedColumns,
+    selectedTable,
+    setSelectedTable,
     setClickHouseParams,
     setAvailableTables,
     setAvailableColumns,
@@ -21,7 +23,6 @@ const ClickHouseForm = () => {
     setPreviewData
   } = useIngestion();
   
-  const [selectedTable, setSelectedTable] = useState('');
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;

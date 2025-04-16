@@ -9,6 +9,7 @@ const IngestClickHouseToFile = () => {
     const {
         clickHouseParams,
         selectedColumns,
+        selectedTable,
         setStatus,
         setError,
         setResultData
@@ -24,7 +25,7 @@ const IngestClickHouseToFile = () => {
 
             const result = await api.ingestion.clickhouseToFlatFile({
                 ...clickHouseParams,
-                table: clickHouseParams.table,
+                table: selectedTable,
                 columns: selectedColumns,
                 outputFilename,
                 delimiter
